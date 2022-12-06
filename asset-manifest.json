@@ -1,14 +1,14 @@
 {
   "files": {
     "main.css": "/fcc-pomodoro-clock/static/css/main.345ec4e7.css",
-    "main.js": "/fcc-pomodoro-clock/static/js/main.db3f38c9.js",
+    "main.js": "/fcc-pomodoro-clock/static/js/main.9de95785.js",
     "static/media/house_alarm-clock_loud-92419.mp3": "/fcc-pomodoro-clock/static/media/house_alarm-clock_loud-92419.2d93f3951ba1443499ff.mp3",
     "index.html": "/fcc-pomodoro-clock/index.html",
     "main.345ec4e7.css.map": "/fcc-pomodoro-clock/static/css/main.345ec4e7.css.map",
-    "main.db3f38c9.js.map": "/fcc-pomodoro-clock/static/js/main.db3f38c9.js.map"
+    "main.9de95785.js.map": "/fcc-pomodoro-clock/static/js/main.9de95785.js.map"
   },
   "entrypoints": [
     "static/css/main.345ec4e7.css",
-    "static/js/main.db3f38c9.js"
+    "static/js/main.9de95785.js"
   ]
 }
