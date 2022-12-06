@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { maxTimeLength, minTimeLength, oneMinute, oneSecond } from './constants'
 import beep from './house_alarm-clock_loud-92419.mp3';
 import TimerLengthController from './TimerLengthController';
@@ -9,31 +9,27 @@ import Stack from 'react-bootstrap/Stack';
 
 export default function PomodoroClock() {
   const [sessionLength, setSessionLength] = useState(25 * oneMinute);
-  const [breakLength, setBreakLength] = useState(1 * oneMinute);
-  const [timeLeft, setTimeLeft] = useState(25 * oneMinute);
+  const [breakLength, setBreakLength] = useState(5 * oneMinute);
   const [isPaused, setIsPaused] = useState(true);
   const [isSessionTime, setisSessionTime] = useState(true);
-  const [isAudioPlaying, setIsAudioPlaying] = useState(false);
-  const timeoutIdRef = useRef(null);
+  const [secondsPassed, setSecondsPassed] = useState(0);
   const beepAudioRef = useRef(null);
+  const intervalRef = useRef(null);
 
   function handleReset() {
     setBreakLength(5 * oneMinute);
     setSessionLength(25 * oneMinute);
-    setTimeLeft(25 * oneMinute);
     setIsPaused(true);
     setisSessionTime(true);
+    setSecondsPassed(0);
     beepAudioRef.current.pause();
     beepAudioRef.current.currentTime = 0;
-    setIsAudioPlaying(false);
+    clearInterval(intervalRef.current);
   }
 
   function handleDecreaseBreak() {
     if (breakLength === minTimeLength) {
       return
-    }
-    if (!isSessionTime) {
-      setTimeLeft(breakLength - oneMinute);
     }
     setBreakLength(breakLength - oneMinute);
   }
@@ -42,18 +38,12 @@ export default function PomodoroClock() {
     if (breakLength === maxTimeLength) {
       return
     }
-    if (!isSessionTime) {
-      setTimeLeft(breakLength + oneMinute);
-    }
     setBreakLength(breakLength + oneMinute);
   }
 
   function handleDecreaseSession() {
     if (sessionLength === minTimeLength) {
       return
-    }
-    if (isSessionTime) {
-      setTimeLeft(sessionLength - oneMinute);
     }
     setSessionLength(sessionLength - oneMinute);
   }
@@ -62,50 +52,42 @@ export default function PomodoroClock() {
     if (sessionLength === maxTimeLength) {
       return
     }
-    if (isSessionTime) {
-      setTimeLeft(sessionLength + oneMinute);
-    }
     setSessionLength(sessionLength + oneMinute);
   }
 
   function handleStartPauseToggle() {
-    setIsPaused(!isPaused);
-  }
-
-  useEffect(() => {
     if (isPaused) {
-      return
-    }
-    if (!isPaused) {
-      timeoutIdRef.current = setTimeout(() => {
-        if (timeLeft === 0) {
-          setIsAudioPlaying(true);
-          if (isSessionTime) {
-            setTimeLeft(breakLength);
+      setIsPaused(false);
+      // Start count down
+      intervalRef.current = setInterval(() => {
+        setSecondsPassed(sp => {
+          if (isSessionTime && sp === sessionLength) {
+            beepAudioRef.current.play();
+            setisSessionTime(isSessionTime => !isSessionTime);
+            return 0;
+          } if (!isSessionTime && sp === breakLength) {
+            beepAudioRef.current.play();
+            setisSessionTime(isSessionTime => !isSessionTime);
+            return 0;
           } else {
-            setTimeLeft(sessionLength);
+            return sp + oneSecond;
           }
-          setisSessionTime(!isSessionTime);
-        } else {
-          setTimeLeft(timeLeft - oneSecond);
-        }
-      }, 1000)
+        });
+      }, oneSecond)
     } else {
-      clearTimeout(timeoutIdRef.current);
+      clearInterval(intervalRef.current);
+      setIsPaused(true);
     }
-    return () => clearTimeout(timeoutIdRef.current);
-  }, [timeLeft, isSessionTime, isPaused, breakLength, sessionLength])
-
-  //Play audio beep
-  useEffect(() => {
-    if (isAudioPlaying) {
-      beepAudioRef.current.play();
-    }
-  }, [isAudioPlaying])
-
-  function handleEndBeep() {
-    setIsAudioPlaying(false);
   }
+
+  let timeLeft;
+  if (isSessionTime) {
+    timeLeft = sessionLength;
+  } else {
+    timeLeft = breakLength;
+  }
+
+  timeLeft = timeLeft - secondsPassed;  
 
   return (
     <Stack gap={3}>
@@ -136,7 +118,6 @@ export default function PomodoroClock() {
       <AudioPlayer
         ref={beepAudioRef}
         src={beep}
-        onEnded={handleEndBeep}
       />
       <TimerDisplay
         isSessionTime={isSessionTime}
