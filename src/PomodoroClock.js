@@ -31,6 +31,9 @@ export default function PomodoroClock() {
     if (breakLength === minTimeLength) {
       return
     }
+    if (!isSessionTime) {
+      setSecondsPassed(0);
+    }
     setBreakLength(breakLength - oneMinute);
   }
 
@@ -38,7 +41,11 @@ export default function PomodoroClock() {
     if (breakLength === maxTimeLength) {
       return
     }
+    if (!isSessionTime) {
+      setSecondsPassed(0);
+    }
     setBreakLength(breakLength + oneMinute);
+
   }
 
   function handleDecreaseSession() {
@@ -51,6 +58,9 @@ export default function PomodoroClock() {
   function handleIncreaseSession() {
     if (sessionLength === maxTimeLength) {
       return
+    }
+    if (isSessionTime) {
+      setSecondsPassed(0);
     }
     setSessionLength(sessionLength + oneMinute);
   }
@@ -87,7 +97,7 @@ export default function PomodoroClock() {
     timeLeft = breakLength;
   }
 
-  timeLeft = timeLeft - secondsPassed;  
+  timeLeft = timeLeft - secondsPassed;
 
   return (
     <Stack gap={3}>
