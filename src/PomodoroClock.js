@@ -45,12 +45,14 @@ export default function PomodoroClock() {
       setSecondsPassed(0);
     }
     setBreakLength(breakLength + oneMinute);
-
   }
 
   function handleDecreaseSession() {
     if (sessionLength === minTimeLength) {
       return
+    }
+    if (isSessionTime) {
+      setSecondsPassed(0);
     }
     setSessionLength(sessionLength - oneMinute);
   }
